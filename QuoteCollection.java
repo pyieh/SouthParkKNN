@@ -6,16 +6,23 @@ public class QuoteCollection implements Serializable {
    HashMap<String, HashSet<Vector>> quotes; // mapping of Character -> Quotes said by that character
    Integer totalWordCount = 0;
    HashMap<String, Integer> wordFrequency = new HashMap<>(); // mapping of Word -> Number of quotes that contain this word
+   Integer size = 0;
+   HashSet<Vector> vectors;
+
    public QuoteCollection() {
       quotes = new HashMap<>();
+      vectors = new HashSet<>();
    }
-   Integer size = 0;
+
 
    public void add(Vector v) {
       add(v, v.classification);
    }
 
    public void add(Vector v, String character) {
+      // add vector v to set of all quotes
+      vectors.add(v);
+
       // add Vector v to that corresponding character's set of quotes
       HashSet<Vector> set = quotes.getOrDefault(character, new HashSet<>());
       set.add(v);
@@ -69,6 +76,9 @@ public class QuoteCollection implements Serializable {
       return qc;
    }
 
+   public HashSet<Vector> getAllVectors() {
+      return vectors;
+   }
 
    // number of quotes
    public Integer size() {

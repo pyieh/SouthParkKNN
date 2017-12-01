@@ -19,6 +19,6 @@ Our output is the prediction of what character would most likely say the input s
 Also our program could easily be used for other data sets, such as for other shows or presidents.
 # Work Log
 Each person did roughly equal amount of work.
-Pierson: KNN
+Pierson: KNN, Okapi Distance
 Michael: Dataset, Interface
 Daniel: Documentation, Slides
