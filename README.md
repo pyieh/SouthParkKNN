@@ -18,7 +18,8 @@ First we prompt the user to enter k-value, which we will use for calculating. Th
 Our output is the prediction of what character would most likely say the input string. This is useful if you were writing dialogue for South Park and wanted to check that your phrasing style was in keeping with the characters standard style. 
 Also our program could easily be used for other data sets, such as for other shows or presidents.
 # Work Log
-Each person did roughly equal amount of work.
+Everyone did bug fixing and connecting everything together. Each person did roughly equal amount of work.
+Main focuses:
 Pierson: KNN, Okapi Distance
 Michael: Dataset, Interface
 Daniel: Documentation, Slides
