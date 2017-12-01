@@ -1,32 +1,35 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class Knn {
    static ArrayList<Vector> vectors = new ArrayList<>();
    static Integer k = 3;
+   static Integer readUpTo = 100;
 
    public static void readVectors(String filename) {
       try {
-         FileReader fr = new FileReader("./src/" + filename);
+         FileReader fr = new FileReader(filename);
          BufferedReader br = new BufferedReader(fr);
          String line;
-
-         while ( (line = br.readLine()) != null) {
-
-            String[] attributes = line.split(",");
-            Vector v = new Vector();
-            for (int i = 0; i < attributes.length; i++) {
-               if (i == attributes.length - 1)
-                  v.setClass(Integer.parseInt(attributes[i]));
-               else
-                  v.add(Integer.parseInt(attributes[i]));
+         int i = 0;
+         while ( (line = br.readLine()) != null && i < readUpTo) {
+            if (i%2 == 1) { // only every other line contains information
+               System.out.println(i + ":" + line);
+               String[] words = line.split(",");
+               Integer season = Integer.parseInt(words[0]);
+               Integer episode = Integer.parseInt(words[1]);
+               String character = words[2];
+               words = getWords(Arrays.copyOfRange(words, 3, words.length));
+               Vector v = new Vector(words, character);
+               vectors.add(v);
             }
-            vectors.add(v);
-            //System.out.println("Adding item:" + v.toString());
+            i++;
          }
+         ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(new File("QuoteVectors")));
+         os.writeObject(vectors);
       }
       catch (Exception e) {
          System.out.println(e);
@@ -34,7 +37,25 @@ public class Knn {
       }
    }
 
-   private static double l2Norm(Vector v1, Vector v2) {
+   private static void printArray(String[] arr) {
+      System.out.print("[");
+      for(String s: arr) {
+         System.out.print(s + ", ");
+      }
+      System.out.println("]");
+   }
+
+   private static String[] getWords(String[] quote) {
+      String fullQuote = "";
+      for(String s: quote) {
+         fullQuote += s;
+      }
+      fullQuote = fullQuote.replaceAll("[^A-Za-z0-9 ]","");
+      return fullQuote.split(" ");
+
+   }
+
+   /*private static double l2Norm(Vector v1, Vector v2) {
       double ret = 0;
       System.out.println("For "+ v2.toString2() + ":");
       if (v1.size() != v2.size())
@@ -49,9 +70,9 @@ public class Knn {
       }
       System.out.println(")=" + Math.pow(ret,1.0/2));
       return Math.pow(ret, 1.0/2);
-   }
+   }*/
 
-   public static Integer classifyVector(Vector newV) {
+   /*public static Integer classifyVector(Vector newV) {
       // calculate distances
       ArrayList<VectorDistance> vds = new ArrayList<>();
       for (Vector v: vectors) {
@@ -78,17 +99,25 @@ public class Knn {
       }
       newV.setClass(retClass);
       return retClass;
-   }
+   }*/
 
    public static void main(String[] args) {
-      readVectors("input.txt");
+      // uncomment this when we've properly processed the input
+      /*try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("QuoteVectors")))) {
+         vectors = (ArrayList<Vector>) is.readObject();
+      } catch (Exception e) {
+         System.out.println("Couldn't read vectors from file, recreating...");
+         readVectors("all-seasons.csv");
+      }*/
+      readVectors("all-seasons.csv");
 
       // Age = middle age, Income = middle class
-      Vector newVector = new Vector();
+      /*Vector newVector = new Vector();
       newVector.add(2);
       newVector.add(2);
 
       classifyVector(newVector);
       System.out.println(newVector);
+      */
    }
 }
