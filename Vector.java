@@ -1,8 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.io.Serializable;
 
-public class Vector {
+public class Vector implements Serializable {
    HashMap<String, Integer> words;
    String classification;
 
@@ -52,7 +53,7 @@ public class Vector {
    }
 
    public Integer get(String s) {
-      return words.get(s);
+      return words.getOrDefault(s, 0);
    }
 
 }

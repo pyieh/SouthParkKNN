@@ -1,8 +1,17 @@
 import java.util.ArrayList;
 
 public class OkapiDistance {
+   
+   private double k1 = 1.2, b = .75, k2 = 100.0;
+   public OkapiDistance(double k1, double b, double k2) {
+      this.k1 = k1;
+      this.b = b;
+      this.k2 = k2;
+   } 
+   
+   public OkapiDistance() {} 
+
    public double findDistance(Vector query, Vector quote, QuoteCollection allQuotes) {
-      double k1 = 1.2, b = .75, k2 = 100.0;
       double ret = 0;
       for (String word: query.getWords()) {
          double dfi = allQuotes.getQuoteFrequency(word); // number of documents that contain term ti

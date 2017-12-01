@@ -5,11 +5,19 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Knn {
-   static QuoteCollection vectors = new QuoteCollection();
-   static Integer k = 3;
-   static Integer readUpTo = 100;
+   private QuoteCollection vectors;
+   private Integer k = 3;
+   //private Integer readUpTo = 100;
+   private OkapiDistance okapi_dist;
 
-   public static void readVectors(String filename) {
+   public Knn(String filename, int k, OkapiDistance dist) {
+      this.k = k;
+      this.vectors = readVectors(filename, true, 100);
+      this.okapi_dist = dist;
+   } 
+
+   public static QuoteCollection readVectors(String filename, boolean write_vectors, int readUpTo) {
+      QuoteCollection vectors = new QuoteCollection();
       try {
          FileReader fr = new FileReader(filename);
          BufferedReader br = new BufferedReader(fr);
@@ -28,13 +36,17 @@ public class Knn {
             }
             i++;
          }
-         ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(new File("QuoteVectors")));
-         os.writeObject(vectors);
+         if(write_vectors) {
+            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(new File("QuoteVectors")));
+            os.writeObject(vectors);
+         }
       }
       catch (Exception e) {
          System.out.println(e);
          System.exit(-1);
       }
+
+      return vectors;
    }
 
    private static void printArray(String[] arr) {
@@ -45,6 +57,11 @@ public class Knn {
       System.out.println("]");
    }
 
+
+   private static String[] getWords(String quote) {
+      return getWords(quote.split(" "));
+   }
+
    private static String[] getWords(String[] quote) {
       String fullQuote = "";
       for(String s: quote) {
@@ -52,7 +69,6 @@ public class Knn {
       }
       fullQuote = fullQuote.replaceAll("[^A-Za-z0-9 ]","");
       return fullQuote.split(" ");
-
    }
 
    /*private static double l2Norm(Vector v1, Vector v2) {
@@ -71,12 +87,17 @@ public class Knn {
       System.out.println(")=" + Math.pow(ret,1.0/2));
       return Math.pow(ret, 1.0/2);
    }*/
+   
+   public String classify(String input) {
+      return classifyVector(new Vector(getWords(input), null));
+   }
+   
 
-   /*public static Integer classifyVector(Vector newV) {
+   public String classifyVector(Vector newV) {
       // calculate distances
       ArrayList<VectorDistance> vds = new ArrayList<>();
-      for (Vector v: vectors) {
-         double dist = l2Norm(newV, v);
+      for (Vector v: this.vectors.getAllVectors()) {
+         double dist = this.okapi_dist.findDistance(newV, v, this.vectors);
          VectorDistance vd = new VectorDistance(v, dist);
          vds.add(vd);
          //System.out.println(vd.toString());
@@ -84,12 +105,12 @@ public class Knn {
 
       // get k nearest neighbors and have them vote
       Collections.sort(vds, new VectorComparator());
-      HashMap<Integer, Integer> counts = new HashMap<>();
+      HashMap<String, Integer> counts = new HashMap<>();
       Integer maxCount = -1;
-      Integer retClass = -1;
-      for(int i = 0; i < k; i++) {
+      String retClass = null;
+      for(int i = 0; i < this.k; i++) {
          System.out.println(i + " closest: " + vds.get(i));
-         Integer classification = vds.get(i).getVector().classification;
+         String classification = vds.get(i).getVector().classification;
          Integer currCount = counts.getOrDefault(classification, 0);
          if (++currCount > maxCount) {
             maxCount = currCount;
@@ -97,9 +118,9 @@ public class Knn {
          }
          counts.put(classification, currCount+1);
       }
-      newV.setClass(retClass);
+      newV.setClassification(retClass);
       return retClass;
-   }*/
+   }
 
    public static void main(String[] args) {
       // uncomment this when we've properly processed the input
@@ -109,7 +130,7 @@ public class Knn {
          System.out.println("Couldn't read vectors from file, recreating...");
          readVectors("all-seasons.csv");
       }*/
-      readVectors("all-seasons.csv");
+      //readVectors("all-seasons.csv");
 
       // Age = middle age, Income = middle class
       /*Vector newVector = new Vector();

@@ -2,6 +2,8 @@
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
+//import Knn;
+//import OkapiDistance;
 
 public class Main {
    
@@ -13,14 +15,16 @@ public class Main {
 
          // initialize KNN
          System.out.println("Loading KNN...");
+         OkapiDistance dist = new OkapiDistance();
+         Knn knn_model = new Knn("all-seasons.csv", k, dist);
 
-         start_input_loop(/*pass in knn*/input_reader);
+         start_input_loop(input_reader, knn_model);
 
       }
    }
    
 
-   public static void start_input_loop(/*pass in knn*/Scanner input_reader) {
+   public static void start_input_loop(Scanner input_reader, Knn knn_model) {
       
       boolean running = true;
       while(running) { 
@@ -38,7 +42,7 @@ public class Main {
                //System.out.println("Input String: " + input);
                
                // send to KNN
-               String predicted = "Test Character";
+               String predicted = knn_model.classify(input);
 
                System.out.println("Prediction: " + predicted);
             }
