@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Knn {
-   static ArrayList<Vector> vectors = new ArrayList<>();
+   static QuoteCollection vectors = new QuoteCollection();
    static Integer k = 3;
    static Integer readUpTo = 100;
 
