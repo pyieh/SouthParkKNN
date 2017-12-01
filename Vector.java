@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Vector {
    HashMap<String, Integer> words;
@@ -33,6 +34,18 @@ public class Vector {
    /*public String toString2() {
       return "Vector" + values.toString();
    }*/
+
+   public Integer getWordCount() {
+      Integer len = 0;
+      for (String s: words.keySet()) {
+         len += words.get(s);
+      }
+      return len;
+   }
+
+   public Set<String> getWords() { return words.keySet(); }
+
+   public boolean contains(String s) { return words.containsKey(s); }
 
    public Integer size() {
       return words.size();
