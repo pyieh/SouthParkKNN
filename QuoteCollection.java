@@ -36,6 +36,7 @@ public class QuoteCollection implements Serializable {
 
       // update document frequency for each word in vector
       for (String s: v.getWords()) {
+         s = s.toLowerCase();
          Integer count = wordFrequency.getOrDefault(s, 0);
          count += v.get(s);
          wordFrequency.put(s, count);

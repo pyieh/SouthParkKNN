@@ -5,18 +5,34 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Knn {
-   private QuoteCollection vectors;
-   private Integer k = 3;
-   //private Integer readUpTo = 100;
-   private OkapiDistance okapi_dist;
+   public static QuoteCollection vectors;
+   public static Integer k = 3;
+   public static OkapiDistance okapi_dist;
+   public static Integer readUpTo = 100;
 
    public Knn(String filename, int k, OkapiDistance dist) {
       this.k = k;
       this.vectors = readVectors(filename, true, 100);
       this.okapi_dist = dist;
-   } 
+   }
+
+   public Knn(QuoteCollection quotes, int k, OkapiDistance dist) {
+      this.k = k;
+      this.vectors = quotes;
+      this.okapi_dist = dist;
+   }
+
+   public void setK(int k) {
+      this.k = k;
+   }
 
    public static QuoteCollection readVectors(String filename, boolean write_vectors, int readUpTo) {
+      // uncomment this when we've properly processed the input
+      /*try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("QuoteVectors")))) {
+         return (QuoteCollection) is.readObject();
+      } catch (Exception e) {
+         System.out.println("Couldn't read vectors from file, recreating...");
+      }*/
       QuoteCollection vectors = new QuoteCollection();
       try {
          FileReader fr = new FileReader(filename);
@@ -24,15 +40,27 @@ public class Knn {
          String line;
          int i = 0;
          while ( (line = br.readLine()) != null && i < readUpTo) {
+            String character = null;
             if (i%2 == 1) { // only every other line contains information
                System.out.println(i + ":" + line);
                String[] words = line.split(",");
                Integer season = Integer.parseInt(words[0]);
                Integer episode = Integer.parseInt(words[1]);
-               String character = words[2];
+               character = words[2];
                words = getWords(Arrays.copyOfRange(words, 3, words.length));
                Vector v = new Vector(words, character);
                vectors.add(v);
+            }
+            else {
+               while (i != 0 && line.length() != 1) {
+                  String[] words = line.split(",");
+                  words = getWords(words);
+                  Vector v = new Vector(words, character);
+                  vectors.add(v);
+
+                  i++;
+                  line = br.readLine();
+               }
             }
             i++;
          }
@@ -59,7 +87,7 @@ public class Knn {
 
 
    private static String[] getWords(String quote) {
-      return getWords(quote.split(" "));
+      return quote.replaceAll("[^A-Za-z0-9 ]","").split(" ");
    }
 
    private static String[] getWords(String[] quote) {
@@ -88,16 +116,16 @@ public class Knn {
       return Math.pow(ret, 1.0/2);
    }*/
    
-   public String classify(String input) {
+   public static String classify(String input) {
       return classifyVector(new Vector(getWords(input), null));
    }
    
 
-   public String classifyVector(Vector newV) {
+   public static String classifyVector(Vector newV) {
       // calculate distances
       ArrayList<VectorDistance> vds = new ArrayList<>();
-      for (Vector v: this.vectors.getAllVectors()) {
-         double dist = this.okapi_dist.findDistance(newV, v, this.vectors);
+      for (Vector v: vectors.getAllVectors()) {
+         double dist = okapi_dist.findDistance(newV, v, vectors);
          VectorDistance vd = new VectorDistance(v, dist);
          vds.add(vd);
          //System.out.println(vd.toString());
@@ -105,10 +133,11 @@ public class Knn {
 
       // get k nearest neighbors and have them vote
       Collections.sort(vds, new VectorComparator());
+      Collections.reverse(vds);
       HashMap<String, Integer> counts = new HashMap<>();
       Integer maxCount = -1;
       String retClass = null;
-      for(int i = 0; i < this.k; i++) {
+      for(int i = 0; i < k; i++) {
          System.out.println(i + " closest: " + vds.get(i));
          String classification = vds.get(i).getVector().classification;
          Integer currCount = counts.getOrDefault(classification, 0);
@@ -130,9 +159,11 @@ public class Knn {
          System.out.println("Couldn't read vectors from file, recreating...");
          readVectors("all-seasons.csv");
       }*/
-      //readVectors("all-seasons.csv");
+      vectors = readVectors("all-seasons.csv",false, 143666);
+      okapi_dist = new OkapiDistance();
 
       // Age = middle age, Income = middle class
+      classify("fatass");
       /*Vector newVector = new Vector();
       newVector.add(2);
       newVector.add(2);

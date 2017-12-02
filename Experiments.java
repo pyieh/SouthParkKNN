@@ -141,7 +141,7 @@ public class Experiments
       int correct = 0; 
 
       for(Vector v : test_data.getAllVectors()) {
-         String pred = knn_model.classify(v);
+         String pred = knn_model.classifyVector(v);
 
          if(pred.equals(v.classification))
             correct += 1;

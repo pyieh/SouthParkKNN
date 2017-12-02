@@ -18,6 +18,7 @@ public class Vector implements Serializable {
       }
    }
    public void add(String s) {
+      s = s.toLowerCase();
       Integer count = words.getOrDefault(s,0);
       words.put(s,count+1);
    }
