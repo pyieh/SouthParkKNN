@@ -9,23 +9,93 @@ import java.util.ArrayList;
 public class Experiments 
 {
    public static void main(String[] args) {
+
+      String filename = "all-seasons.csv";
+      double p_test = 0.5;
+
+      ArrayList<String> k_results = run_k_experiments(filename, p_test, new OkapiDistance(), new IntRange(1,5));
+
+      System.out.println("\n\nK Experiment Results");
+      for(String line : k_results)
+         System.out.println(line);
+      
+      write_csv(k_results, "k_test_results.csv");
+
+      ArrayList<String> okapi_results = run_okapi_experiments(filename, p_test, 3, 
+                                                              new DoubleRange(1.0, 2.0, 0.1), // k1_range
+                                                              new DoubleRange(0.5, 1.0, 0.05), // b_range
+                                                              new DoubleRange(0, 100, 10)  // k2_range
+                                                              );
+
+      System.out.println("\n\nOkapi Experiment Results");
+      for(String line : okapi_results)
+         System.out.println(line);
+
+      write_csv(okapi_results, "okapi_test_results.csv");
+   }
+
+   public static ArrayList<String> run_okapi_experiments(String filename, double p_test, int k, DoubleRange k1_range, DoubleRange b_range, DoubleRange k2_range) {
+      // Load dataset
+      System.out.println("Loading dataset...");
+      QuoteCollection all_data = Knn.readVectors(filename, false, 200);
+      
+      // Split into training and testing sets
+      System.out.println("Splitting dataset...");
+      QuoteCollection train_data = new QuoteCollection();
+      QuoteCollection test_data = new QuoteCollection();
+      
+      int train_size = (int)(all_data.size() * (1.0 - p_test));
+      for(Vector v : all_data.getAllVectors()) {
+         if(train_data.size() < train_size) 
+            train_data.add(v);
+         else
+            test_data.add(v);
+      }
+      
+      String csv_header = "k1,b,k2,acc";
+      ArrayList<String> results = new ArrayList<String>();
+      results.add(csv_header);
+
+      for(Double k1 : k1_range) {
+         for(Double b : b_range) {
+            for(Double k2 : k2_range) {
+               System.out.println("Running k1 = " + k1 + ", b = " + b + ", k2 = " + k2 + " test");
+                
+               OkapiDistance dist = new OkapiDistance(k1, b, k2);
+               Knn knn_model = new Knn(train_data, k, dist);
+               double acc = test_knn(knn_model, test_data);
+               results.add(k1 + "," + b + "," + k2 + "," + acc);
+            }  
+         } 
+      } 
+
+
+
       /*
-      String line_a = "fdsa,fdsa,fdsa";
-      String line_b = "qwer,weqer,qwer";
-      String line_c = "uio,uio,uio";
-      
-      ArrayList<String> lines = new ArrayList<String>();
-      lines.add(line_a);
-      lines.add(line_b);
-      lines.add(line_c);
-      
-      write_csv(lines, "csv_test.txt");
+      for(Double k1 : k1_range) {
+         System.out.println("k1 = " + k1);
+         for(Double b : b_range) {
+            System.out.println("k1 = " + k1 + ", b = " + b);
+            for(Double k2 : k2_range) {
+               System.out.println("k2 = " + k2);
+               System.out.println("Running k1 = " + k1 + ", b = " + b + ", k2 = " + k2 + " test");
+
+
+               OkapiDistance dist = new OkapiDistance(k1, b, k2);
+               Knn knn_model = new Knn(train_data, k, dist);
+               double acc = test_knn(knn_model, test_data);
+               results.add(k1 + "," + b + "," + k2 + "," + acc);
+            }
+         }
+      }
       */
 
-      run_k_experiments("all-seasons.csv", 0.5, new IntRange(1,5));
-   }
-   
-   public static void run_k_experiments(String filename, double p_test, IntRange k_range) {
+      return results;
+   }   
+
+
+
+   public static ArrayList<String> run_k_experiments(String filename, double p_test, OkapiDistance dist, IntRange k_range) {
       
       // Load dataset
       System.out.println("Loading dataset...");
@@ -44,9 +114,10 @@ public class Experiments
             test_data.add(v);
       }
       
-      OkapiDistance dist = new OkapiDistance();
 
+      String csv_header = "k,acc";
       ArrayList<String> results = new ArrayList<String>();
+      results.add(csv_header);
       // Run tests for all k values
       for(int k : k_range) {
          System.out.println("Running k = " + k + " test");
@@ -56,11 +127,10 @@ public class Experiments
       
          results.add(k + "," + acc);
       }
-      
-      System.out.println("\n\nFinal Results");
-      for(String line : results)
-         System.out.println(line);
 
+      return results;
+      
+      
    } 
    
    
@@ -112,7 +182,7 @@ public class Experiments
       } 
 
       public Iterator<Integer> iterator() {
-         return this; 
+         return new IntRange(this.min, this.max, this.step); 
       } 
 
       public boolean hasNext() {
@@ -143,7 +213,7 @@ public class Experiments
       } 
 
       public Iterator<Double> iterator() {
-         return this; 
+         return new DoubleRange(this.min, this.max, this.step); 
       } 
 
       public boolean hasNext() {
@@ -151,16 +221,23 @@ public class Experiments
       }
 
       public Double next() {
-         return this.min + this.step * this.count++;
+         double val = this.min + this.step * this.count++;
+         
+         // correct rounding errors to a precision of 5 decimal places
+         val = (int)(val * 10e5) / 10e5;
+
+         if(val > this.max)
+            // catch overshoot
+            return this.max;
+         else
+            return val;
       }
 
       public void remove() {
          throw new UnsupportedOperationException();
       }
    } 
-
-
-
+   
 
 }
 
