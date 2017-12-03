@@ -20,6 +20,6 @@ Also our program could easily be used for other data sets, such as for other sho
 # Work Log
 Everyone did bug fixing and connecting everything together. Each person did roughly equal amount of work.
 Main focuses:
-Pierson: KNN, Okapi Distance
+Pierson: KNN, Okapi Distance, Cosine Distance (normalization), 
 Michael: Dataset, Interface
 Daniel: Documentation, Slides
