@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.io.Serializable;
 
-public class Vector implements Serializable {
+public abstract class Vector implements Serializable {
    HashMap<String, Integer> words;
    String classification;
+   HashMap<String, Double> normalizedVector;
 
    public Vector() {
       words = new HashMap<>();
+      normalizedVector = new HashMap<>();
    }
    public Vector(String[] words, String classification) {
       this.classification = classification;
@@ -16,6 +19,7 @@ public class Vector implements Serializable {
       for(String s: words) {
          add(s);
       }
+      normalizedVector = new HashMap<>();
    }
    public void add(String s) {
       s = s.toLowerCase();
@@ -33,16 +37,16 @@ public class Vector implements Serializable {
       return ret;
    }
 
-   /*public String toString2() {
-      return "Vector" + values.toString();
-   }*/
-
    public Integer getWordCount() {
       Integer len = 0;
       for (String s: words.keySet()) {
          len += words.get(s);
       }
       return len;
+   }
+
+   public Integer getDistinctWordCount() {
+      return words.keySet().size();
    }
 
    public Set<String> getWords() { return words.keySet(); }
@@ -57,4 +61,27 @@ public class Vector implements Serializable {
       return words.getOrDefault(s, 0);
    }
 
+   public int getHighestRawFrequency() {
+      if (words.size() == 0)
+         return 0;
+
+      return Collections.max(words.values());
+   }
+
+   public double log2( double x ) {
+      return Math.log10(x) / Math.log10(2.0);
+   }
+
+   // normalizes the frequency of each word using TF-IDF formula
+   public abstract void normalize(QuoteCollection dc);
+
+   public abstract double getNormalizedFrequency(String word);
+
+   public double getL2Norm() {
+      double sum = 0;
+      for (String word: words.keySet()) {
+         sum += Math.pow(getNormalizedFrequency(word), 2);
+      }
+      return Math.sqrt(sum);
+   }
 }

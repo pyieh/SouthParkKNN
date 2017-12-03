@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class OkapiDistance {
+public class OkapiDistance implements DocumentDistance {
    
    private double k1 = 1.2, b = .75, k2 = 100.0;
    public OkapiDistance(double k1, double b, double k2) {

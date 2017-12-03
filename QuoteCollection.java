@@ -14,7 +14,6 @@ public class QuoteCollection implements Serializable {
       vectors = new HashSet<>();
    }
 
-
    public void add(Vector v) {
       add(v, v.classification);
    }
@@ -88,5 +87,11 @@ public class QuoteCollection implements Serializable {
 
    public double getAvgDocLength() {
       return ((double)totalWordCount) / size();
+   }
+
+   public void normalize(QuoteCollection qc) {
+      for (Vector v: vectors) {
+         v.normalize(qc);
+      }
    }
 }
