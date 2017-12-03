@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Knn {
-   public static QuoteCollection vectors;
-   public static Integer k = 3;
-   public static OkapiDistance okapi_dist;
-   public static Integer readUpTo = 100;
+   public QuoteCollection vectors;
+   public Integer k = 3;
+   public OkapiDistance okapi_dist;
+   public Integer readUpTo = 100;
 
    public Knn(String filename, int k, OkapiDistance dist) {
       this.k = k;
@@ -26,7 +26,7 @@ public class Knn {
       this.k = k;
    }
 
-   public static QuoteCollection readVectors(String filename, boolean write_vectors, int readUpTo) {
+   public QuoteCollection readVectors(String filename, boolean write_vectors, int readUpTo) {
       // uncomment this when we've properly processed the input
       /*try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("QuoteVectors")))) {
          return (QuoteCollection) is.readObject();
@@ -77,7 +77,7 @@ public class Knn {
       return vectors;
    }
 
-   private static void printArray(String[] arr) {
+   private void printArray(String[] arr) {
       System.out.print("[");
       for(String s: arr) {
          System.out.print(s + ", ");
@@ -86,11 +86,11 @@ public class Knn {
    }
 
 
-   private static String[] getWords(String quote) {
+   private String[] getWords(String quote) {
       return quote.replaceAll("[^A-Za-z0-9 ]","").split(" ");
    }
 
-   private static String[] getWords(String[] quote) {
+   private String[] getWords(String[] quote) {
       String fullQuote = "";
       for(String s: quote) {
          fullQuote += s;
@@ -98,30 +98,12 @@ public class Knn {
       fullQuote = fullQuote.replaceAll("[^A-Za-z0-9 ]","");
       return fullQuote.split(" ");
    }
-
-   /*private static double l2Norm(Vector v1, Vector v2) {
-      double ret = 0;
-      System.out.println("For "+ v2.toString2() + ":");
-      if (v1.size() != v2.size())
-         return -1;
-      System.out.print("sqrt(");
-      for(int i = 0; i < v1.size(); i++) {
-         if (i != v1.size() - 1)
-            System.out.print("(" + v1.get(i) + "-" + v2.get(i) + ")^2 + ");
-         else
-            System.out.print("(" + v1.get(i) + "-" + v2.get(i) + ")^2");
-         ret += Math.pow(v1.get(i)-v2.get(i), 2);
-      }
-      System.out.println(")=" + Math.pow(ret,1.0/2));
-      return Math.pow(ret, 1.0/2);
-   }*/
    
-   public static String classify(String input) {
+   public String classify(String input) {
       return classifyVector(new Vector(getWords(input), null));
    }
-   
 
-   public static String classifyVector(Vector newV) {
+   public String classifyVector(Vector newV) {
       // calculate distances
       ArrayList<VectorDistance> vds = new ArrayList<>();
       for (Vector v: vectors.getAllVectors()) {
@@ -151,25 +133,26 @@ public class Knn {
       return retClass;
    }
 
-   public static void main(String[] args) {
-      // uncomment this when we've properly processed the input
-      /*try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("QuoteVectors")))) {
-         vectors = (ArrayList<Vector>) is.readObject();
-      } catch (Exception e) {
-         System.out.println("Couldn't read vectors from file, recreating...");
-         readVectors("all-seasons.csv");
-      }*/
-      vectors = readVectors("all-seasons.csv",false, 143666);
-      okapi_dist = new OkapiDistance();
 
-      // Age = middle age, Income = middle class
-      classify("fatass");
-      /*Vector newVector = new Vector();
-      newVector.add(2);
-      newVector.add(2);
-
-      classifyVector(newVector);
-      System.out.println(newVector);
-      */
-   }
+//   public static void main(String[] args) {
+//      // uncomment this when we've properly processed the input
+//      /*try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("QuoteVectors")))) {
+//         vectors = (ArrayList<Vector>) is.readObject();
+//      } catch (Exception e) {
+//         System.out.println("Couldn't read vectors from file, recreating...");
+//         readVectors("all-seasons.csv");
+//      }*/
+//      vectors = readVectors("all-seasons.csv",false, 143666);
+//      okapi_dist = new OkapiDistance();
+//
+//      // Age = middle age, Income = middle class
+//      classify("fatass");
+//      /*Vector newVector = new Vector();
+//      newVector.add(2);
+//      newVector.add(2);
+//
+//      classifyVector(newVector);
+//      System.out.println(newVector);
+//      */
+//   }
 }
