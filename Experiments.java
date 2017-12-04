@@ -11,7 +11,7 @@ public class Experiments
    public static void main(String[] args) {
 
       String filename = "all-seasons.csv";
-      double p_test = 0.5;
+      double p_test = 0.2;
 
       ArrayList<String> k_results = run_k_experiments(filename, p_test, new OkapiDistance(), new IntRange(1,5));
 
@@ -34,10 +34,14 @@ public class Experiments
       write_csv(okapi_results, "okapi_test_results.csv");
    }
 
+   public static QuoteCollection load_dataset(String filename) {
+      return Knn.readVectors(filename, false, 100000).filter(100);
+   } 
+
    public static ArrayList<String> run_okapi_experiments(String filename, double p_test, int k, DoubleRange k1_range, DoubleRange b_range, DoubleRange k2_range) {
       // Load dataset
       System.out.println("Loading dataset...");
-      QuoteCollection all_data = Knn.readVectors(filename, false, 200);
+      QuoteCollection all_data = load_dataset(filename);
       
       // Split into training and testing sets
       System.out.println("Splitting dataset...");
@@ -51,7 +55,11 @@ public class Experiments
          else
             test_data.add(v);
       }
-      
+
+
+      System.out.println("Training Data Size : " + train_data.size());
+      System.out.println("Testing Data Size : " + test_data.size());
+
       String csv_header = "k1,b,k2,acc";
       ArrayList<String> results = new ArrayList<String>();
       results.add(csv_header);
@@ -99,7 +107,7 @@ public class Experiments
       
       // Load dataset
       System.out.println("Loading dataset...");
-      QuoteCollection all_data = Knn.readVectors(filename, false, 200);
+      QuoteCollection all_data = load_dataset(filename);
       
       // Split into training and testing sets
       System.out.println("Splitting dataset...");
@@ -114,6 +122,8 @@ public class Experiments
             test_data.add(v);
       }
       
+      System.out.println("Training Data Size : " + train_data.size());
+      System.out.println("Testing Data Size : " + test_data.size());
 
       String csv_header = "k,acc";
       ArrayList<String> results = new ArrayList<String>();
@@ -143,7 +153,7 @@ public class Experiments
       for(Vector v : test_data.getAllVectors()) {
          String pred = knn_model.classifyVector(v);
 
-         if(pred.equals(v.classification))
+         if((v == null && pred == null) || (pred != null && pred.equals(v.classification)))
             correct += 1;
       } 
 
