@@ -16,7 +16,11 @@ public class Main {
          // initialize KNN
          System.out.println("Loading KNN...");
          OkapiDistance dist = new OkapiDistance();
-         Knn knn_model = new Knn("all-seasons.csv", k, dist);
+         QuoteCollection data = Knn.readVectors("all-seasons.csv", true, 20000).filter(100);
+
+         System.out.println("Dataset size = " + data.size());
+         Knn knn_model = new Knn(data, k, dist);
+         //Knn knn_model = new Knn("all-seasons.csv", k, dist);
 
          start_input_loop(input_reader, knn_model);
 
