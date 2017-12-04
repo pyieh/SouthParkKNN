@@ -48,16 +48,21 @@ public class Knn {
                Integer episode = Integer.parseInt(words[1]);
                character = words[2];
                words = getWords(Arrays.copyOfRange(words, 3, words.length));
-               Vector v = new DocumentVector(words, character);
-               vectors.add(v);
+               if(words.length >= 3 && words.length <= 20) {
+                  Vector v = new DocumentVector(words, character);
+                  vectors.add(v);
+               }
             }
             else {
                while (i != 0 && line.length() != 1) {
                   String[] words = line.split(",");
                   words = getWords(words);
-                  Vector v = new DocumentVector(words, character);
-                  vectors.add(v);
-
+                  if(words.length >= 3 && words.length <= 20) {
+                     Vector v = new DocumentVector(words, character);
+                     
+                     if(character != null)
+                        vectors.add(v);
+                  }
                   i++;
                   line = br.readLine();
                }
@@ -135,7 +140,7 @@ public class Knn {
          }
          counts.put(classification, currCount+1);
       }
-      newV.setClassification(retClass);
+      //newV.setClassification(retClass);
       return retClass;
    }
 

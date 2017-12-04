@@ -7,6 +7,8 @@ import java.util.InputMismatchException;
 
 public class Main {
    
+   public static String characters[] = {"Stan", "Kyle", "Cartman", "Kenny"};
+
    public static void main(String[] args) {
       
       try(Scanner input_reader = new Scanner(System.in)) {
@@ -15,8 +17,9 @@ public class Main {
 
          // initialize KNN
          System.out.println("Loading KNN...");
-         OkapiDistance dist = new OkapiDistance();
-         QuoteCollection data = Knn.readVectors("all-seasons.csv", true, 20000).filter(100);
+         OkapiDistance dist = new OkapiDistance(1.4, 0.2, 50);
+         HashSet<String> filter_chars = new HashSet<String>(Arrays.asList(characters));
+         QuoteCollection data = Knn.readVectors("all-seasons.csv", true, 10000000).filter(filter_chars);
 
          System.out.println("Dataset size = " + data.size());
          Knn knn_model = new Knn(data, k, dist);

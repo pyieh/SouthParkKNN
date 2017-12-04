@@ -5,26 +5,34 @@ import java.io.File;
 
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Experiments 
 {
+   //public static String characters[] = {"Stan", "Kyle", "Cartman", "Kenny", "Butters", "Randy"};
+   public static String characters[] = {"Stan", "Kyle", "Cartman", "Kenny"};
+
    public static void main(String[] args) {
 
       String filename = "all-seasons.csv";
       double p_test = 0.2;
-
-      ArrayList<String> k_results = run_k_experiments(filename, p_test, new OkapiDistance(), new IntRange(1,5));
+   
+      ArrayList<String> k_results = run_k_experiments(filename, p_test, new OkapiDistance(1.4, 0.2, 50), new IntRange(1,21,2));
 
       System.out.println("\n\nK Experiment Results");
       for(String line : k_results)
          System.out.println(line);
       
       write_csv(k_results, "k_test_results.csv");
-
+      
+      //1.4,0.2,50.0
+      /*
       ArrayList<String> okapi_results = run_okapi_experiments(filename, p_test, 3, 
-                                                              new DoubleRange(1.0, 2.0, 0.1), // k1_range
-                                                              new DoubleRange(0.5, 1.0, 0.05), // b_range
-                                                              new DoubleRange(0, 100, 10)  // k2_range
+                                                              new DoubleRange(1.0, 1.5, 0.1), // k1_range
+                                                              new DoubleRange(0.0, 1.0, 0.2), // b_range
+                                                              new DoubleRange(50, 100, 25)  // k2_range
                                                               );
 
       System.out.println("\n\nOkapi Experiment Results");
@@ -32,15 +40,26 @@ public class Experiments
          System.out.println(line);
 
       write_csv(okapi_results, "okapi_test_results.csv");
+      */
    }
 
    public static QuoteCollection load_dataset(String filename) {
-      return Knn.readVectors(filename, false, 100000).filter(100);
+      System.out.println("Loading dataset...");
+      HashSet<String> filter_chars = new HashSet<String>(Arrays.asList(characters));
+      //QuoteCollection data = Knn.readVectors(filename, false, 1000000000).filter(250);
+      //QuoteCollection data = Knn.readVectors(filename, false, 50000).filter(filter_chars);
+      QuoteCollection data = Knn.readVectors(filename, false, 100000000).filter(filter_chars);
+      Set<String> chars = data.getCharacters();
+      System.out.println("Loaded " + data.size() + " data points for " + chars.size() + " characters");
+      System.out.println("Characters");
+      for(String c : chars)
+         System.out.println("   " + c);
+      System.out.println();
+      return data;
    } 
 
    public static ArrayList<String> run_okapi_experiments(String filename, double p_test, int k, DoubleRange k1_range, DoubleRange b_range, DoubleRange k2_range) {
       // Load dataset
-      System.out.println("Loading dataset...");
       QuoteCollection all_data = load_dataset(filename);
       
       // Split into training and testing sets
@@ -72,6 +91,9 @@ public class Experiments
                OkapiDistance dist = new OkapiDistance(k1, b, k2);
                Knn knn_model = new Knn(train_data, k, dist);
                double acc = test_knn(knn_model, test_data);
+
+
+               System.out.println("Accuracy for k1 = " + k1 + ", b = " + b + ", k2 = " + k2 + " : " + acc);
                results.add(k1 + "," + b + "," + k2 + "," + acc);
             }  
          } 
@@ -106,7 +128,6 @@ public class Experiments
    public static ArrayList<String> run_k_experiments(String filename, double p_test, OkapiDistance dist, IntRange k_range) {
       
       // Load dataset
-      System.out.println("Loading dataset...");
       QuoteCollection all_data = load_dataset(filename);
       
       // Split into training and testing sets
@@ -134,12 +155,12 @@ public class Experiments
          Knn knn_model = new Knn(train_data, k, dist);
 
          double acc = test_knn(knn_model, test_data);
-      
+         
+         System.out.println("Accuracy for k = " + k + " : " + acc);
          results.add(k + "," + acc);
       }
 
       return results;
-      
       
    } 
    
@@ -153,10 +174,11 @@ public class Experiments
       for(Vector v : test_data.getAllVectors()) {
          String pred = knn_model.classifyVector(v);
 
+         //System.out.println("Pred " + pred + ": " + v);
          if((v == null && pred == null) || (pred != null && pred.equals(v.classification)))
             correct += 1;
       } 
-
+      
       return correct / (double)test_data.size();
    } 
 

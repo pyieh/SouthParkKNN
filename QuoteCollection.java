@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class QuoteCollection implements Serializable {
    HashMap<String, HashSet<Vector>> quotes; // mapping of Character -> Quotes said by that character
@@ -66,7 +67,7 @@ public class QuoteCollection implements Serializable {
    }
 
    // filters out any Characters that aren't in the given character set
-   public QuoteCollection filter(HashSet<Character> characters) {
+   public QuoteCollection filter(HashSet<String> characters) {
       QuoteCollection qc = new QuoteCollection();
       for (String character: this.quotes.keySet()) {
          if (characters.contains(character)) {
@@ -79,6 +80,10 @@ public class QuoteCollection implements Serializable {
    public HashSet<Vector> getAllVectors() {
       return vectors;
    }
+   
+   public Set<String> getCharacters() {
+      return quotes.keySet();
+   } 
 
    // number of quotes
    public Integer size() {
