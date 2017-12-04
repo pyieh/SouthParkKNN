@@ -42,7 +42,7 @@ public class Knn {
          while ( (line = br.readLine()) != null && i < readUpTo) {
             String character = null;
             if (i%2 == 1) { // only every other line contains information
-               System.out.println(i + ":" + line);
+               //System.out.println(i + ":" + line);
                String[] words = line.split(",");
                Integer season = Integer.parseInt(words[0]);
                Integer episode = Integer.parseInt(words[1]);
@@ -126,7 +126,7 @@ public class Knn {
       Integer maxCount = -1;
       String retClass = null;
       for(int i = 0; i < k; i++) {
-         System.out.println(i + " closest: " + vds.get(i));
+         //System.out.println(i + " closest: " + vds.get(i));
          String classification = vds.get(i).getVector().classification;
          Integer currCount = counts.getOrDefault(classification, 0);
          if (++currCount > maxCount) {
