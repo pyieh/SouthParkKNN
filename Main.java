@@ -1,6 +1,8 @@
 
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 //import Knn;
 //import OkapiDistance;
